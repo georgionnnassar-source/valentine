@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Be My Valentine 💘</title>
+  <style>
+    :root{
+      --bg1:#ff9a9e;
+      --bg2:#fad0c4;
+      --card:#ffffffcc;
+      --text:#2b2b2b;
+      --yes:#22c55e;
+      --no:#ef4444;
+    }
+
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(circle at top, var(--bg2), var(--bg1));
+      overflow:hidden;
+      color:var(--text);
+    }
+
+    .hearts{
+      position:fixed;
+      inset:0;
+      pointer-events:none;
+      opacity:.25;
+      filter: blur(.2px);
+    }
+
+    .heart{
+      position:absolute;
+      font-size:24px;
+      animation: floatUp linear infinite;
+    }
+
+    @keyframes floatUp{
+      from{ transform: translateY(110vh) scale(.8) rotate(0deg); }
+      to{ transform: translateY(-20vh) scale(1.2) rotate(25deg); }
+    }
+
+    .card{
+      width:min(560px, 92vw);
+      background:var(--card);
+      backdrop-filter: blur(10px);
+      border:1px solid #ffffff80;
+      border-radius:24px;
+      padding:28px 22px;
+      text-align:center;
+      box-shadow: 0 18px 45px rgba(0,0,0,.18);
+      position:relative;
+    }
+
+    h1{
+      margin:0 0 8px 0;
+      font-size: clamp(28px, 4vw, 42px);
+      letter-spacing:.2px;
+    }
+
+    p{
+      margin: 6px 0 18px;
+      font-size: clamp(14px, 2.2vw, 18px);
+      line-height:1.35;
+    }
+
+    .name{
+      font-weight:700;
+    }
+
+    .buttons{
+      display:flex;
+      gap:14px;
+      justify-content:center;
+      flex-wrap:wrap;
+      margin-top:14px;
+      position:relative;
+      height:70px;
+    }
+
+    button{
+      border:0;
+      border-radius:14px;
+      padding:14px 20px;
+      font-size:18px;
+      font-weight:700;
+      cursor:pointer;
+      transition: transform .08s ease, filter .2s ease;
+      user-select:none;
+    }
+
+    button:active{ transform: scale(.98); }
+    .yes{ background: var(--yes); color:white; box-shadow: 0 10px 22px rgba(34,197,94,.35); }
+    .no{
+      background: var(--no);
+      color:white;
+      box-shadow: 0 10px 22px rgba(239,68,68,.35);
+      position:absolute;
+      left:50%;
+      transform: translateX(70px);
+    }
+
+    .footer{
+      margin-top:18px;
+      font-size:13px;
+      opacity:.75;
+    }
+
+    .popup{
+      position:fixed;
+      inset:0;
+      display:none;
+      align-items:center;
+      justify-content:center;
+      background: rgba(0,0,0,.35);
+      padding:20px;
+    }
+
+    .popup .box{
+      width:min(520px, 92vw);
+      background:white;
+      border-radius:22px;
+      padding:22px;
+      text-align:center;
+      box-shadow: 0 18px 45px rgba(0,0,0,.25);
+    }
+
+    .big{
+      font-size: clamp(26px, 4vw, 40px);
+      margin:0 0 8px;
+    }
+
+    .close{
+      margin-top:14px;
+      background:#111827;
+      color:white;
+      border-radius:14px;
+      padding:12px 18px;
+      font-weight:700;
+    }
+
+    .tiny{
+      font-size:12px;
+      opacity:.7;
+      margin-top:10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- floating hearts background -->
+  <div class="hearts" id="hearts"></div>
+
+  <main class="card">
+    <h1>Will you be my Valentine? 💘</h1>
+    <p>
+      Hey <span class="name" id="herName">my love</span>, I have one very important question…
+    </p>
+
+    <div class="buttons" id="btnArea">
+      <button class="yes" id="yesBtn">YES 💖</button>
+      <button class="no" id="noBtn">NO 🙈</button>
+    </div>
+
+    <div class="footer">
+      (Warning: the “NO” button is kinda shy 😅)
+    </div>
+  </main>
+
+  <!-- success popup -->
+  <div class="popup" id="popup">
+    <div class="box">
+      <div class="big">YAYYYYY!!! 🎉💞</div>
+      <p id="successText">You just made me the happiest person ever.</p>
+      <button class="close" id="closeBtn">Close</button>
+      <div class="tiny">Tip: Screenshot this moment 📸</div>
+    </div>
+  </div>
+
+  <script>
+    // Customize these two lines:
+    const HER_NAME = "Sarah";         // change to her name
+    const YOUR_NAME = "Gix";          // change to your name
+
+    document.getElementById("herName").textContent = HER_NAME;
+
+    const popup = document.getElementById("popup");
+    const successText = document.getElementById("successText");
+    const yesBtn = document.getElementById("yesBtn");
+    const noBtn = document.getElementById("noBtn");
+    const btnArea = document.getElementById("btnArea");
+    const closeBtn = document.getElementById("closeBtn");
+
+    yesBtn.addEventListener("click", () => {
+      successText.textContent = `Okay ${HER_NAME}… we’re officially Valentines 💖 — love you, ${YOUR_NAME}!`;
+      popup.style.display = "flex";
+      confettiBurst();
+    });
+
+    closeBtn.addEventListener("click", () => {
+      popup.style.display = "none";
+    });
+
+    // Make the NO button dodge the cursor/tap
+    function moveNoButton() {
+      const areaRect = btnArea.getBoundingClientRect();
+      const btnRect = noBtn.getBoundingClientRect();
+
+      const padding = 8;
+      const maxX = areaRect.width - btnRect.width - padding;
+      const maxY = areaRect.height - btnRect.height - padding;
+
+      const x = Math.max(padding, Math.random() * maxX);
+      const y = Math.max(padding, Math.random() * maxY);
+
+      noBtn.style.left = x + "px";
+      noBtn.style.top = y + "px";
+      noBtn.style.transform = "none";
+    }
+
+    // Works on desktop hover + mobile tap
+    noBtn.addEventListener("mouseenter", moveNoButton);
+    noBtn.addEventListener("click", moveNoButton);
+    noBtn.addEventListener("touchstart", (e) => { e.preventDefault(); moveNoButton(); }, { passive:false });
+
+    // Hearts background
+    const hearts = document.getElementById("hearts");
+    const heartEmojis = ["💗","💖","💘","💝","💕","❤️"];
+    for (let i=0; i<22; i++){
+      const span = document.createElement("div");
+      span.className = "heart";
+      span.textContent = heartEmojis[Math.floor(Math.random()*heartEmojis.length)];
+      span.style.left = Math.random()*100 + "vw";
+      span.style.animationDuration = (6 + Math.random()*10) + "s";
+      span.style.animationDelay = (-Math.random()*10) + "s";
+      span.style.fontSize = (18 + Math.random()*26) + "px";
+      hearts.appendChild(span);
+    }
+
+    // Tiny confetti effect (no libraries)
+    function confettiBurst(){
+      const count = 120;
+      for (let i=0; i<count; i++){
+        const piece = document.createElement("div");
+        piece.style.position = "fixed";
+        piece.style.left = (50 + (Math.random()*10 - 5)) + "vw";
+        piece.style.top = "45vh";
+        piece.style.width = "8px";
+        piece.style.height = "12px";
+        piece.style.background = `hsl(${Math.random()*360}, 90%, 60%)`;
+        piece.style.opacity = "0.95";
+        piece.style.transform = `rotate(${Math.random()*360}deg)`;
+        piece.style.borderRadius = "2px";
+        piece.style.pointerEvents = "none";
+        document.body.appendChild(piece);
+
+        const dx = (Math.random()*2 - 1) * 260;
+        const dy = - (200 + Math.random()*260);
+
+        piece.animate([
+          { transform: piece.style.transform, opacity: 1, offset: 0 },
+          { transform: `translate(${dx}px, ${dy}px) rotate(${Math.random()*720}deg)`, opacity: 1, offset: .6 },
+          { transform: `translate(${dx}px, ${dy+520}px) rotate(${Math.random()*900}deg)`, opacity: 0, offset: 1 }
+        ], {
+          duration: 1400 + Math.random()*700,
+          easing: "cubic-bezier(.15,.6,.2,1)"
+        });
+
+        setTimeout(()=>piece.remove(), 2400);
+      }
+    }
+
+    // Place NO button nicely on load for mobile
+    window.addEventListener("load", () => {
+      noBtn.style.top = "8px";
+      noBtn.style.left = "55%";
+    });
+  </script>
+
+</body>
+</html>
